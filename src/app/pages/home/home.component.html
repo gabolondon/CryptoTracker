@@ -1,0 +1,48 @@
+<div class="p-4">
+  <mat-form-field class="">
+    <mat-label>Search a currency</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Search a currency" #input>
+  </mat-form-field>
+
+<div class="mat-elevation-z8">
+  <table mat-table [dataSource]="dataSource" matSort>
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="asset_id_quote">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Currency </th>
+      <td mat-cell *matCellDef="let element"> {{element.asset_id_base}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="price">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Price </th>
+      <td mat-cell *matCellDef="let element"> {{element.price| currency:'USD'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="volume_1day_usd">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> 24h Vol. </th>
+      <td mat-cell *matCellDef="let element"> {{element.volume_1day_usd | currency:'USD'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="favorite">
+      <th mat-header-cell *matHeaderCellDef> Favorite </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="onSelectFavotire(element)" class="" fontIcon="favorite">
+          <mat-icon class="mat-18" color="primary">add</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedNamesColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedNamesColumns;"></tr>
+
+    <!-- Row shown when there is no matching data. -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+    </tr>
+  </table>
+<mat-paginator [pageSizeOptions]="[10, 25, 100]" aria-label="Select page of Currencies"></mat-paginator>
+
+  </div>
+
+</div>
