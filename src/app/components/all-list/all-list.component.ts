@@ -1,5 +1,5 @@
 import { UserService } from './../../services/user.service';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,27 +17,19 @@ import {
   removeFavorite,
 } from 'src/app/store/actions/favorites.action';
 import {
-  delay,
   fromEvent,
-  last,
   map,
   Observable,
   startWith,
-  withLatestFrom,
+  Subject,
+  takeUntil,
 } from 'rxjs';
-import {
-  selectCollectionState,
-  selectCurrencies,
-} from 'src/app/store/selectors/currencies.selector';
+import { selectCurrenciesState } from 'src/app/store/selectors/currencies.selector';
 import { selectFavoritesIds } from 'src/app/store/selectors/favorites.selector';
 import { Favorite } from 'src/app/models/Favorite.interface';
 import { Constants } from 'src/assets/Constants';
-import {
-  fadeInOnEnterAnimation,
-  fadeOutOnLeaveAnimation,
-} from 'angular-animations';
+import { fadeInOnEnterAnimation } from 'angular-animations';
 import { UserState } from 'src/app/models/UserState.interface';
-import { addFavoriteToUser } from 'src/app/store/actions/user.action';
 import { selectUserinfo } from 'src/app/store/selectors/user.selector';
 
 @Component({
@@ -46,7 +38,7 @@ import { selectUserinfo } from 'src/app/store/selectors/user.selector';
   styleUrls: ['./all-list.component.scss'],
   animations: [fadeInOnEnterAnimation()],
 })
-export class AllListComponent implements OnInit {
+export class AllListComponent {
   userInfo: UserState;
   bannerData: any;
   currencies$: Observable<any> = new Observable();
@@ -63,52 +55,63 @@ export class AllListComponent implements OnInit {
   ];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  private destroy$ = new Subject<void>();
 
   constructor(private store: Store<AppState>, private userApi: UserService) {
-    // this.loadingRows = Array.from({ length: 15 }, (_, index) =>
-    //   index.toString()
-    // );
     this.mobileQuery = fromEvent<MediaQueryListEvent>(window, 'resize').pipe(
-      map(() => window.matchMedia('(max-width: 700px)'))
+      takeUntil(this.destroy$),
+      map(() => window.matchMedia('(max-width: 780px)'))
     );
-    this.store.select(selectFavoritesIds).subscribe((state) => {
-      this.favorites = [...state];
-    });
-    this.store.select(selectUserinfo).subscribe((state) => {
-      console.log('state de user en all list', state);
-      this.userInfo = { ...state };
-      if (state?.favoritesIds && state?.favoritesIds.length > 0) {
-        this.userApi.SetUserData({
-          ...this.userInfo,
-          favoritesIds: state.favoritesIds,
-        });
-      }
-    });
+    this.store
+      .select(selectFavoritesIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        this.favorites = [...state];
+      });
+    this.store
+      .select(selectUserinfo)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        this.userInfo = { ...state };
+        if (state?.favoritesIds && state?.favoritesIds.length > 0) {
+          console.log('veo la data para set userinfo', state.favoritesIds);
+          this.userApi.SetUserData({
+            ...this.userInfo,
+            favoritesIds: state.favoritesIds,
+          });
+        }
+      });
   }
 
   ngOnInit(): void {
     this.getAllData();
 
     this.mobileQuery
-      .pipe(startWith(window.matchMedia('(max-width: 700px)')))
+      .pipe(
+        startWith(window.matchMedia('(max-width: 700px)')),
+        takeUntil(this.destroy$)
+      )
+
       .subscribe((query) => {
-        // console.log('query', query);
         this.displayedNamesColumns = query.matches
           ? ['asset_id_quote', 'price', 'favorite']
           : ['asset_id_quote', 'price', 'volume_1day_usd', 'favorite'];
       });
 
-    this.store.select(selectCollectionState).subscribe((res) => {
-      const withLogo = res.map((curr) => {
-        return {
-          ...curr,
-          logo: this.iconData.find((x) => x.asset_id === curr.asset_id_base),
-        };
+    this.store
+      .select(selectCurrenciesState)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => {
+        const withLogo = res.map((curr) => {
+          return {
+            ...curr,
+            logo: this.iconData.find((x) => x.asset_id === curr.asset_id_base),
+          };
+        });
+        this.dataSource = new MatTableDataSource([...withLogo]);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       });
-      this.dataSource = new MatTableDataSource([...withLogo]);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
   }
   getAllData() {
     this.store.dispatch(LoadCurrencies());
@@ -143,5 +146,10 @@ export class AllListComponent implements OnInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

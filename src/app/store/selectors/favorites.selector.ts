@@ -22,3 +22,10 @@ export const selectFavoritesHdata = createSelector(selectFavorites, (state) =>
 export const selectFavoritesState = createSelector(selectFavorites, (state) => [
   ...state,
 ]);
+
+export const selectLastDayData = createSelector(selectFavorites, (state) =>
+  state.map((favorite) => ({
+    symbol_id: favorite.symbol_id,
+    last_day_info: favorite.last_day_info,
+  }))
+);

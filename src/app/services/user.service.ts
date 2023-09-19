@@ -15,7 +15,7 @@ import { AppState } from '../store/app.state';
 import { LoginUser } from '../store/actions/user.action';
 import { UserModel } from '../models/UserModel.interface';
 import { UserState } from '../models/UserState.interface';
-import { Observable, mergeMap } from 'rxjs';
+import { Observable, mergeMap, take, takeUntil } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class UserService {
   ) {
     // const ref = collection(firestore, `Users`);
     // this.userDoc$ = collectionData(ref);
-    this.afAuth.authState.subscribe((user) => {
+    this.afAuth.authState.pipe().subscribe((user) => {
       if (user) {
         this.userData = user;
         localStorage.setItem('user', JSON.stringify(this.userData));

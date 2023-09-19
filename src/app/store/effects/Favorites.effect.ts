@@ -12,6 +12,7 @@ import {
   switchMap,
   filter,
   concatMap,
+  take,
 } from 'rxjs/operators';
 import { CurrencyApiService } from 'src/app/services/currency-api.service';
 import { Store, props } from '@ngrx/store';
@@ -38,36 +39,39 @@ export class FavoritesEffects {
     this.actions$.pipe(
       ofType(addFavorite),
       mergeMap((action) => {
-        const favoriteExists = action.favorite?.last_day_info;
+        // const favoriteExists = action.favorite?.last_day_info;
 
-        if (favoriteExists) {
-          return EMPTY;
-        } else {
-          return this.currencyService
-            .getHistoricalData(action.favorite.symbol_id)
-            .pipe(
-              concatMap((currencies) => {
-                return (
-                  of({
-                    type: addFavoriteData.type,
-                    favorite: {
-                      ...action.favorite,
-                      last_day_info: currencies[currencies.length - 1],
-                      historical_data: currencies,
-                    },
-                  }),
-                  of({
-                    type: addFavoriteToUser.type,
-                    favId: action.favorite,
-                  })
-                );
-              }),
-              catchError(() => {
-                console.log('error');
-                return EMPTY;
-              })
-            );
-        }
+        // if (favoriteExists) {
+        //   return EMPTY;
+        // } else {
+        return this.currencyService
+          .getHistoricalData(action.favorite.symbol_id)
+          .pipe(
+            concatMap((currencies) => {
+              return (
+                of({
+                  type: addFavoriteData.type,
+                  favorite: {
+                    ...action.favorite,
+                    last_day_info: currencies[currencies.length - 1],
+                    historical_data: currencies,
+                  },
+                }),
+                of({
+                  type: addFavoriteToUser.type,
+                  favId: {
+                    ...action.favorite,
+                    last_day_info: currencies[currencies.length - 1],
+                  },
+                })
+              );
+            }),
+            catchError(() => {
+              console.log('error');
+              return EMPTY;
+            })
+          );
+        // }
       })
     )
   );
@@ -97,10 +101,10 @@ export class FavoritesEffects {
               concatMap((wsRes) => {
                 if (wsRes.symbol_id) {
                   return of(
-                    updatePriceOnFav({
-                      symbolId: wsRes.symbol_id,
-                      price: wsRes.price,
-                    }),
+                    // updatePriceOnFav({
+                    //   symbolId: wsRes.symbol_id,
+                    //   price: wsRes.price,
+                    // }),
                     updateTradesData({ trades: wsRes })
                   );
                 } else {

@@ -8,6 +8,7 @@ import {
   mergeMap,
   withLatestFrom,
   mergeAll,
+  take,
 } from 'rxjs/operators';
 import { CurrencyApiService } from 'src/app/services/currency-api.service';
 import { Store, props } from '@ngrx/store';
@@ -34,7 +35,7 @@ export class CurrenciesEffects {
               volume_1day_usd: currency.volume_1day_usd,
               favorite: favorites.find(
                 (f) => f.symbol_id === currency.symbol_id || false
-              ), // Use the favorites state within the pipe
+              ),
             })),
           })),
 

@@ -5,7 +5,6 @@ import { Currency } from '../models/Currency.interface';
 import { Observable, delay, from, map, switchMap, tap } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 import { Constants } from 'src/assets/Constants';
-import * as moment from 'moment';
 import { HistoricalData } from '../models/HistoricalData.interface';
 
 @Injectable({
@@ -49,12 +48,18 @@ export class CurrencyApiService {
   }
 
   getHistoricalData(symbolId: string) {
+    // const date = new Date();
+    // date.setDate(1);
+    // date.setHours(0);
+    // date.setMinutes(0);
+    // date.setSeconds(0);
+    // date.setMilliseconds(0);
+
+    // const formattedDate = date.toISOString();
+
+    // console.log('Httprequest made on getHistoricalData', formattedDate);
     // return this.http.get<HistoricalData[]>(
-    //   `${
-    //     environment.BASE_URL
-    //   }/ohlcv/${symbolId}/history?period_id=1DAY&time_start=${moment()
-    //     .startOf('month')
-    //     .format('YYYY-MM-DDT00:00:00')}`,
+    //   `${environment.BASE_URL}/ohlcv/${symbolId}/history?period_id=4HRS&time_start=${formattedDate}`,
     //   { headers: this.headers }
     // );
     return new Observable<HistoricalData[]>((observer) => {
