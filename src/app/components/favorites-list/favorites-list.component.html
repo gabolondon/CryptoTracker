@@ -1,0 +1,56 @@
+<div class="px-1 w-full pt-4 lg:pt-0  h-full ">
+  <div class="lg:flex flex-row-reverse">
+    <div
+      class="p-4 mb-4 mx-2 mx-auto w-full lg:w-2/6 min-w-[300px] max-w-[600px] rounded-2xl lg:rounded-sm items-center bg-[#f9fbfc] drop-shadow ">
+      <span class="text-lg font-bold text-slate-600 mb-2">Your Favorites</span>
+      <div class="scroll-container mx-2 mb-2 overflow-x-auto max-h-screen">
+        <app-favorite-card (selectFavotire)="onSelectedFavotire($event)" *ngFor="let favorite of favorites"
+          [favoriteId]="favorite"></app-favorite-card>
+      </div>
+    </div>
+    <div
+      class="p-4 mb-2 mx-auto lg:mx-4 h-full min-h-screen  max-w-[600px] lg:w-full lg:w-4/6 min-w-[350px] rounded-2xl lg:rounded-sm bg-[#f9fbfc] drop-shadow">
+      <div
+        class="mb-4 flex flex-col sm:flex-row items-center justify-evenly bg-[#2969ce] rounded-3xl p-4 text-white mt-2 drop-shadow-lg">
+        <img class="m-2 min-h-[46px]" height="160" width="160" src="/assets/chart11.png" alt="logo tracker" />
+        <div class="p-2 text-xl font-bold text-left align-top flex flex-col items-start">
+          Track your portfolio and favorite currencies with ease.
+          <span class="text-sm font-normal">keep an eye on the
+            historical chart data and the trades made by people like you right now!</span>
+        </div>
+      </div>
+      <div *ngIf="selectedFavorite?.asset_id_base" class="bg-white p-4 rounded-3xl min-h-[230px] drop-shadow-lg">
+        <!-- <div class="bg-white p-4 rounded-3xl min-h-[230px]"> -->
+        <div class="flex items-center justify-between px-6">
+          <span class="font-bold text-xl text-slate-500">
+            {{
+            selectedFavorite?.asset_id_base +
+            " / " +
+            selectedFavorite?.asset_id_quote
+            }}
+          </span>
+          <div class="flex items-center">
+            <div class="mx-2 text-slate-600">
+              {{
+              price || 123456 | currency : "USD" : "symbol-narrow" : "1.2-4"
+              }}
+              USD
+            </div>
+            <div class="text-sm align-center" [ngStyle]="{ color: change > 0 ? 'green' : 'red' }">
+              {{ change | percent : "1.1-2" }} 24h
+            </div>
+          </div>
+        </div>
+        <canvas #myCanvas baseChart class="chart mb-4" [data]="lineChartData" [options]="lineChartOptions"
+          [type]="lineChartType">
+        </canvas>
+        <span class="text-sm text-slate-500 mb-2">Check the last trades made on your favorite</span>
+        <app-trades-list [symbolId]="selectedFavorite?.symbol_id"></app-trades-list>
+      </div>
+      <div *ngIf="!selectedFavorite?.asset_id_base "
+        class="w-full flex justify-center items-center min-h-[230px] text-slate-500 rounded-3xl bg-slate-200 drop-shadow-lg">
+        There is no currency data to show <mat-icon class="mat-18 animate-bounce ml-1">info</mat-icon>
+      </div>
+    </div>
+  </div>
+</div>

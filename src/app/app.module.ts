@@ -1,5 +1,8 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,9 +24,24 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { StoreModule } from '@ngrx/store';
-import { currenciesReducer } from './store/reducers/currencies.reducer';
 import { ROOT_REDUCERS } from './store/app.state';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from 'src/enviroments/enviroment';
+import { SignInComponent } from './components/sign-in/sign-in.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { EffectsModule } from '@ngrx/effects';
+import { CurrenciesEffects } from './store/effects/Currencies.effect';
+import { FavoritesListComponent } from './components/favorites-list/favorites-list.component';
+import { FavoriteCardComponent } from './components/favorite-card/favorite-card.component';
+import { SideNavComponent } from './components/side-nav/side-nav.component';
+import { FavoritesEffects } from './store/effects/Favorites.effect';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { NgChartsModule } from 'ng2-charts';
+import { TradesListComponent } from './components/trades-list/trades-list.component';
+import { MatListModule } from '@angular/material/list';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { UserEffects } from './store/effects/User.effect';
 
 @NgModule({
   declarations: [
@@ -32,6 +50,13 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     HomeComponent,
     FavoritesComponent,
     AllListComponent,
+    SignInComponent,
+    SignUpComponent,
+    FavoritesListComponent,
+    FavoriteCardComponent,
+    SideNavComponent,
+    TradesListComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -42,6 +67,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
       maxAge: 25,
       name: 'Testing',
     }),
+    EffectsModule.forRoot([CurrenciesEffects, FavoritesEffects, UserEffects]),
     MatButtonModule,
     MatIconModule,
     MatSidenavModule,
@@ -54,6 +80,13 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     HttpClientModule,
     MatPaginatorModule,
     MatSortModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireAuthModule,
+    AngularFirestoreModule,
+    MatSnackBarModule,
+    NgChartsModule,
+    ScrollingModule,
+    MatListModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

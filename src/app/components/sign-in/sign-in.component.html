@@ -1,0 +1,30 @@
+<div class="gradient-background ">
+  <div class="w-full max-w-lg mx-auto px-4 h-screen min-h-[600px] py-6 ">
+    <div class="p-4 rounded-3xl flex flex-col items-center justify-center bg-white drop-shadow-lg h-full max-h-[600px]">
+      <img class="mb-8 min-h-[70px]" src="/assets/logo.png" width="230" alt="logo tracker">
+      <div class="flex flex-col items-center">
+        <span class="text-3xl font-bold text-slate-500 mb-6">Sign In</span>
+        <span class="text-sm text-slate-500 mb-4">Input a valid email and password to log-in</span>
+        <div class="formGroup">
+          <input type="text" class="formControl" placeholder="Username" #email required />
+        </div>
+        <div class="formGroup">
+          <input type="password" class="formControl" placeholder="Password" #userPassword required />
+        </div>
+        <!-- Calling SignIn Api from AuthService -->
+        <div class="formGroup mt-8">
+          <button mat-raised-button color="primary" class="w-full"
+            (click)="authService.SignIn(email.value, userPassword.value)">Log
+            In</button>
+
+        </div>
+      </div>
+      <div class="mt-2 p-2 ">
+        <span class="mt-4 p-4 text-slate-600 ">Don't have an account?<span
+            class="text-slate-600 font-bold text-[#2969ce] underline" [@clickAnimation] routerLink="/sign-up">
+            Sign Up</span></span>
+      </div>
+    </div>
+  </div>
+
+</div>

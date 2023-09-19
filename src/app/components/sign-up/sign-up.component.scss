@@ -1,0 +1,68 @@
+.formGroup {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.formControl {
+  width: 100%;
+  height: 40px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+}
+
+.mat-mdc-button-base {
+  height: 40px;border-radius: 20px;
+}
+.gradient-background  {
+  background: linear-gradient(314deg, #6d98dd, #c9d8f0, #ffffff);
+  background-size: 600% 600%;
+
+  -webkit-animation: AnimationName 6s ease infinite;
+  -moz-animation: AnimationName 6s ease infinite;
+  animation: AnimationName 6s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 0% 50%
+  }
+
+  50% {
+    background-position: 100% 50%
+  }
+
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 0% 50%
+  }
+
+  50% {
+    background-position: 100% 50%
+  }
+
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+@keyframes AnimationName {
+  0% {
+    background-position: 0% 50%
+  }
+
+  50% {
+    background-position: 100% 50%
+  }
+
+  100% {
+    background-position: 0% 50%
+  }
+}

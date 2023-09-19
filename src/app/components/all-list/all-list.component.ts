@@ -1,69 +1,147 @@
-import { Component } from '@angular/core';
-import { DataSource } from '@angular/cdk/collections';
-import { Observable, ReplaySubject } from 'rxjs';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
+import { UserService } from './../../services/user.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-  { position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-  { position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-  { position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-  { position: 5, name: 'Boron', weight: 10.811, symbol: 'B' },
-  { position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C' },
-  { position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N' },
-  { position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O' },
-  { position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F' },
-  { position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne' },
-];
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { Currency } from 'src/app/models/Currency.interface';
+import { Store } from '@ngrx/store';
+import {
+  addFavoriteOnCurrency,
+  LoadCurrencies,
+  removeFavoriteOnCurrency,
+} from 'src/app/store/actions/currencies.action';
+import { AppState } from 'src/app/store/app.state';
+import {
+  addFavorite,
+  removeFavorite,
+} from 'src/app/store/actions/favorites.action';
+import {
+  delay,
+  fromEvent,
+  last,
+  map,
+  Observable,
+  startWith,
+  withLatestFrom,
+} from 'rxjs';
+import {
+  selectCollectionState,
+  selectCurrencies,
+} from 'src/app/store/selectors/currencies.selector';
+import { selectFavoritesIds } from 'src/app/store/selectors/favorites.selector';
+import { Favorite } from 'src/app/models/Favorite.interface';
+import { Constants } from 'src/assets/Constants';
+import {
+  fadeInOnEnterAnimation,
+  fadeOutOnLeaveAnimation,
+} from 'angular-animations';
+import { UserState } from 'src/app/models/UserState.interface';
+import { addFavoriteToUser } from 'src/app/store/actions/user.action';
+import { selectUserinfo } from 'src/app/store/selectors/user.selector';
 
 @Component({
   selector: 'app-all-list',
   templateUrl: './all-list.component.html',
   styleUrls: ['./all-list.component.scss'],
+  animations: [fadeInOnEnterAnimation()],
 })
-export class AllListComponent {
-  displayedColumns: string[] = ['position', 'name'];
-  dataToDisplay = [...ELEMENT_DATA];
+export class AllListComponent implements OnInit {
+  userInfo: UserState;
+  bannerData: any;
+  currencies$: Observable<any> = new Observable();
+  baseCurrency: string = 'USD';
+  favorites: string[] = [];
+  dataSource!: MatTableDataSource<any>;
+  iconData = Constants.symbols;
+  mobileQuery: Observable<MediaQueryList>;
+  displayedNamesColumns: string[] = [
+    'asset_id_quote',
+    'price',
+    'volume_1day_usd',
+    'favorite',
+  ];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
-  dataSource = new ExampleDataSource(this.dataToDisplay);
-
-  addData() {
-    const randomElementIndex = Math.floor(Math.random() * ELEMENT_DATA.length);
-    this.dataToDisplay = [
-      ...this.dataToDisplay,
-      ELEMENT_DATA[randomElementIndex],
-    ];
-    this.dataSource.setData(this.dataToDisplay);
+  constructor(private store: Store<AppState>, private userApi: UserService) {
+    // this.loadingRows = Array.from({ length: 15 }, (_, index) =>
+    //   index.toString()
+    // );
+    this.mobileQuery = fromEvent<MediaQueryListEvent>(window, 'resize').pipe(
+      map(() => window.matchMedia('(max-width: 700px)'))
+    );
+    this.store.select(selectFavoritesIds).subscribe((state) => {
+      this.favorites = [...state];
+    });
+    this.store.select(selectUserinfo).subscribe((state) => {
+      console.log('state de user en all list', state);
+      this.userInfo = { ...state };
+      if (state?.favoritesIds && state?.favoritesIds.length > 0) {
+        this.userApi.SetUserData({
+          ...this.userInfo,
+          favoritesIds: state.favoritesIds,
+        });
+      }
+    });
   }
 
-  removeData() {
-    this.dataToDisplay = this.dataToDisplay.slice(0, -1);
-    this.dataSource.setData(this.dataToDisplay);
+  ngOnInit(): void {
+    this.getAllData();
+
+    this.mobileQuery
+      .pipe(startWith(window.matchMedia('(max-width: 700px)')))
+      .subscribe((query) => {
+        // console.log('query', query);
+        this.displayedNamesColumns = query.matches
+          ? ['asset_id_quote', 'price', 'favorite']
+          : ['asset_id_quote', 'price', 'volume_1day_usd', 'favorite'];
+      });
+
+    this.store.select(selectCollectionState).subscribe((res) => {
+      const withLogo = res.map((curr) => {
+        return {
+          ...curr,
+          logo: this.iconData.find((x) => x.asset_id === curr.asset_id_base),
+        };
+      });
+      this.dataSource = new MatTableDataSource([...withLogo]);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    });
   }
-}
-class ExampleDataSource extends DataSource<PeriodicElement> {
-  private _dataStream = new ReplaySubject<PeriodicElement[]>();
-
-  constructor(initialData: PeriodicElement[]) {
-    super();
-    this.setData(initialData);
+  getAllData() {
+    this.store.dispatch(LoadCurrencies());
   }
 
-  connect(): Observable<PeriodicElement[]> {
-    return this._dataStream;
+  onSelectFavotire(event: Currency) {
+    if (this.favorites.find((fav) => fav === event.symbol_id)) {
+      this.favorites = this.favorites.filter((fav) => fav !== event.symbol_id);
+      this.store.dispatch(removeFavorite({ symbolId: event.symbol_id }));
+      this.store.dispatch(
+        removeFavoriteOnCurrency({ symbolId: event.symbol_id })
+      );
+    } else {
+      this.favorites.push(event.symbol_id);
+      this.store.dispatch(
+        addFavorite({
+          favorite: {
+            symbol_id: event.symbol_id,
+            asset_id_base: event.asset_id_base,
+            asset_id_quote: event.asset_id_quote,
+            price: event.price,
+            volume_1day: event.volume_1day,
+            volume_1day_usd: event.volume_1day_usd,
+          } as Favorite,
+        })
+      );
+
+      this.store.dispatch(addFavoriteOnCurrency({ symbolId: event.symbol_id }));
+    }
+    console.log(this.favorites);
   }
-
-  disconnect() {}
-
-  setData(data: PeriodicElement[]) {
-    this._dataStream.next(data);
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }

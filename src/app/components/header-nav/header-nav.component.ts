@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-header-nav',
@@ -7,6 +7,7 @@ import { Component } from '@angular/core';
 })
 export class HeaderNavComponent {
   selectedCurrency: string = 'USD';
+  @Output() onShowDrawer = new EventEmitter();
   onSelectedCurrency(event: string) {
     console.log('sended curr', event);
   }

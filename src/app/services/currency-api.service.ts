@@ -2,14 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/enviroments/enviroment';
 import { Currency } from '../models/Currency.interface';
-import { Observable, delay, map } from 'rxjs';
+import { Observable, delay, from, map, switchMap, tap } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 import { Constants } from 'src/assets/Constants';
-
-interface CurrencyList {
-  asset_id_base: string;
-  rates: Currency[];
-}
+import * as moment from 'moment';
+import { HistoricalData } from '../models/HistoricalData.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +22,7 @@ export class CurrencyApiService {
   }
 
   getAllCurrencies(baseCurrency: string) {
+    console.log('Httprequest made on getAllCurrencies', baseCurrency);
     const url = `${environment.BASE_URL}/symbols?filter_exchange_id=COINBASE&filter_asset_id=${baseCurrency}`;
     // return this.http
     //   .get<Currency[]>(url, { headers: this.headers })
@@ -48,5 +46,19 @@ export class CurrencyApiService {
       `${environment.BASE_URL}/exchangerate/${asset}/USD`,
       { headers: this.headers }
     );
+  }
+
+  getHistoricalData(symbolId: string) {
+    // return this.http.get<HistoricalData[]>(
+    //   `${
+    //     environment.BASE_URL
+    //   }/ohlcv/${symbolId}/history?period_id=1DAY&time_start=${moment()
+    //     .startOf('month')
+    //     .format('YYYY-MM-DDT00:00:00')}`,
+    //   { headers: this.headers }
+    // );
+    return new Observable<HistoricalData[]>((observer) => {
+      return observer.next(Constants.HistoricalData as HistoricalData[]);
+    }).pipe(delay(600));
   }
 }

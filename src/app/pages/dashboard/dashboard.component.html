@@ -1,0 +1,22 @@
+<div class="sidenav-container" [class.view-is-mobile]="mobileQuery.matches" *ngIf="shouldRun">
+  <mat-sidenav-container class="flex h-screen">
+    <mat-sidenav #snav class="w-60 border-transparent" [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery.matches" [opened]="!mobileQuery.matches">
+      <app-side-nav></app-side-nav>
+    </mat-sidenav>
+    <mat-sidenav-content class="bg-[#1e2e7810]">
+      <div class="px-4 flex items-center justify-between w-full" *ngIf="mobileQuery.matches">
+        <button mat-mini-fab class="botton-menu" color="primary" (click)="snav.toggle()">
+          <mat-icon class="mat-18 h-16 w-16">menu</mat-icon>
+        </button>
+        <div>
+          <img class="h-16 max-h-[50px]" src="/assets/logo.png" alt="logo tracker">
+        </div>
+        <div class="w-12"></div>
+
+      </div>
+      <router-outlet></router-outlet>
+
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

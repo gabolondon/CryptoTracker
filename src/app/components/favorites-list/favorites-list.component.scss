@@ -1,0 +1,28 @@
+
+
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+@media (max-width: 1024px) {
+  .scroll-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .scroll-container app-favorite-card {
+    flex: 0 0 auto;
+    margin-right:8px;
+  }
+}
+.mat-mdc-row:hover .mat-mdc-cell {
+  border-color: currentColor;
+  background-color: #fbfdff;
+  border-bottom: 1px solid transparent;
+}
+
+.demo-row-is-clicked {
+  font-weight: bold;
+}

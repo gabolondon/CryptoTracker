@@ -1,0 +1,43 @@
+<div class="h-screen bg-[#1e2e7810] flex flex-col justify-between">
+  <div>
+    <img src="/assets/logo.png" class="mb-8 p-4" alt="logo crypto tracker">
+    <div class="flex w-full items-center mb-2">
+      <div class="w-2">
+        <div class=" w-2 h-14 bg-[#2969ce] rounded-e-xl" *ngIf="selected === '/dashboard/home'" [@slideInLeft]></div>
+      </div>
+      <div (click)="onHomeNav($event)"
+        [ngClass]="{'selected': selected === '/dashboard/home', 'unselected-box': selected !== '/dashboard/home' }"
+        class="p-2 mx-4 h-16 w-5/6 rounded-xl flex items-center ">
+        <mat-icon class="mat-24 mx-2">home</mat-icon>
+        <h2 class="title">Home</h2>
+      </div>
+    </div>
+    <div class="flex w-full items-center ">
+      <div class="w-2">
+        <div class=" w-2 h-14 bg-[#2969ce] rounded-e-xl" *ngIf="selected === '/dashboard/favorites'" [@slideInLeft]>
+        </div>
+      </div>
+      <div (click)="onFavNav($event)"
+        [ngClass]="{'selected': selected === '/dashboard/favorites', 'unselected-box': selected !== '/dashboard/favorites' }"
+        class="p-2 mx-4 h-16 w-5/6 rounded-xl flex items-center">
+        <mat-icon class="mat-24 mx-2">star</mat-icon>
+        <h2 class="title">Favorites</h2>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="flex w-full items-center mb-12">
+    <div class="w-4">
+    </div>
+    <div (click)="onLogOut($event)" class="p-2 ml-2 mx-4 h-16 w-5/6 rounded-xl bg-slate-300 flex items-center">
+      <mat-icon class="mat-24 mx-2">power_settings_new</mat-icon>
+      <span class=" text-lg font-bold text-slate-600">Log Out</span>
+    </div>
+
+  </div>
+
+
+
+</div>

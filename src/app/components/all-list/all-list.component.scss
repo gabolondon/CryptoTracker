@@ -1,11 +1,21 @@
-.demo-table {
-  width: 100%;
-}
+
 
 .demo-button-container {
   padding-bottom: 16px;
 }
 
-.demo-button+.demo-button {
-  margin-left: 8px;
+// .mat-column-asset_id_quote{
+//   max-width: 60px;
+// }
+// .mat-column-favorite {
+//   max-width: 0px;
+// }
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  background-color: rgba(157, 157, 232, 0.055);
 }
