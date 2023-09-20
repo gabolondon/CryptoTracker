@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ClickAnimation } from 'src/app/services/animations';
 import { UserService } from 'src/app/services/user.service';
 
@@ -9,12 +10,18 @@ import { UserService } from 'src/app/services/user.service';
   animations: [ClickAnimation],
 })
 export class SignInComponent {
-  value: { email: string; userPassword: string } = {
-    email: '',
-    userPassword: '',
-  };
-  constructor(public authService: UserService) {
-    {
+  constructor(
+    public authService: UserService,
+    private _snackBar: MatSnackBar
+  ) {}
+
+  onLogin(email: string, password: string) {
+    if (email === '' || password === '') {
+      this._snackBar.open('Please fill in all fields', 'Close', {
+        duration: 2000,
+      });
+    } else {
+      this.authService.SignIn(email, password);
     }
   }
 }

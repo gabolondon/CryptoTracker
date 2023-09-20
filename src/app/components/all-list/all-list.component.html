@@ -65,11 +65,11 @@
       <tr class="mat-row px-4 " *matNoDataRow>
         <td class="mat-cell" colspan="4" *ngIf="input.value; else showRow">No data matching the filter
           "{{input.value}}"</td>
-        <ng-container #showRow>
+        <ng-template #showRow>
           <td class="mat-cell " colspan="4">
-            <div *ngFor="let item of loadingRows" class="animate-pulse my-2 bg-indigo-100 w-full h-10 rounded-xl"></div>
+            <div *ngFor="let item of " class="animate-pulse my-2 bg-indigo-100 w-full h-10 rounded-xl"></div>
           </td>
-        </ng-container>
+        </ng-template>
 
 
       </tr>

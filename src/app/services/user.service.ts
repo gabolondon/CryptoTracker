@@ -15,7 +15,7 @@ import { AppState } from '../store/app.state';
 import { LoginUser } from '../store/actions/user.action';
 import { UserModel } from '../models/UserModel.interface';
 import { UserState } from '../models/UserState.interface';
-import { Observable, mergeMap, take, takeUntil } from 'rxjs';
+import { Observable, filter, isEmpty, mergeMap, take, takeUntil } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class UserService {
   ) {
     // const ref = collection(firestore, `Users`);
     // this.userDoc$ = collectionData(ref);
-    this.afAuth.authState.pipe().subscribe((user) => {
+    this.afAuth.authState.subscribe((user) => {
       if (user) {
         this.userData = user;
         localStorage.setItem('user', JSON.stringify(this.userData));
@@ -70,15 +70,13 @@ export class UserService {
       .then((result) => {
         console.log('Firebase SignIn success: ', result.user);
         // this.SetUserData(result.user);
-        this.afAuth.authState.subscribe((user) => {
-          if (user) {
-            this.store.dispatch({
-              type: LoginUser.type,
-              user: user,
-            });
-            this.router.navigate(['dashboard']);
-          }
-        });
+        if (this.userData) {
+          this.store.dispatch({
+            type: LoginUser.type,
+            user: this.userData,
+          });
+          this.router.navigate(['dashboard']);
+        }
       })
       .catch((error) => {
         this._snackBar.open(error.message, 'OK', {
@@ -117,11 +115,13 @@ export class UserService {
           user: parsedUser,
         });
         this.SetUserData({ ...parsedUser, favoritesIds: [] });
-        this.afAuth.authState.subscribe((user) => {
-          if (user) {
-            this.router.navigate(['dashboard']);
-          }
-        });
+        if (this.userData) {
+          this.store.dispatch({
+            type: LoginUser.type,
+            user: this.userData,
+          });
+          this.router.navigate(['dashboard']);
+        }
       })
       .catch((error) => {
         this._snackBar.open(error.message, 'OK', {

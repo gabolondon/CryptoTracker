@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject, of, takeUntil } from 'rxjs';
 import { LiveInfo } from 'src/app/models/Liveinfo.interface';
@@ -9,6 +9,7 @@ import { AppState } from 'src/app/store/app.state';
   selector: 'app-trades-list',
   templateUrl: './trades-list.component.html',
   styleUrls: ['./trades-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradesListComponent {
   buyTrades: LiveInfo[] = [];

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, EMPTY, of, interval } from 'rxjs';
+import { Observable, Subject, EMPTY, of, interval, takeUntil } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { environment } from 'src/enviroments/enviroment';
 import { LiveInfo } from '../models/Liveinfo.interface';
@@ -13,11 +13,16 @@ import { selectFavoritesIds } from '../store/selectors/favorites.selector';
 export class WebsocketService {
   socket$: WebSocketSubject<any>;
 
+  private destroy$ = new Subject<void>();
+
   constructor(private store: Store<AppState>) {
-    this.store.select(selectFavoritesIds).subscribe((state) => {
-      console.log('watch the ids on wsservice', state);
-      this.hsMessage = state;
-    });
+    this.store
+      .select(selectFavoritesIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state) => {
+        console.log('watch the ids on wsservice', state);
+        this.hsMessage = state;
+      });
   }
   hsMessage: string[];
   // handShakeMessage = {
@@ -27,7 +32,6 @@ export class WebsocketService {
   //     subscribe_data_type: ['trade'],
   //     subscribe_filter_symbol_id: message,
   //   };
-
   public connect(): WebSocketSubject<any> {
     if (!this.socket$ || this.socket$.closed) {
       this.socket$ = webSocket({
@@ -54,6 +58,9 @@ export class WebsocketService {
 
   closeConnection() {
     this.connect().complete();
+
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   sendMessage(msg: any) {

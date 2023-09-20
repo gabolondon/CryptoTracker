@@ -71,16 +71,21 @@ export class FavoritesListComponent implements OnInit {
 
   ngOnInit() {
     // this.store.dispatch(initPriceLive());
-    this.wsPrice$ = this.wsService.connect().pipe(
-      takeUntil(this.destroy$),
-      map((state) => {
-        if (state.symbol_id === this.selectedFavorite?.symbol_id) {
-          return state.price;
-        } else {
-          return this.price;
-        }
-      })
-    );
+    this.wsService
+      .connect()
+      .pipe(
+        takeUntil(this.destroy$),
+        map((state) => {
+          if (state.symbol_id === this.selectedFavorite?.symbol_id) {
+            return state.price;
+          } else {
+            return this.price;
+          }
+        })
+      )
+      .subscribe((price) => {
+        this.price = price;
+      });
     this.store
       .select(selectFavoritesState)
       .pipe(
@@ -108,18 +113,6 @@ export class FavoritesListComponent implements OnInit {
           }
         }
       });
-    // this.store
-    //   .select('favorites')
-    //   .pipe(
-    //     takeUntil(this.destroy$),
-    //     filter((state) => state.length > 0),
-    //     delay(600),
-    //     take(1),
-    //     map((fav) => fav.map((id) => id.symbol_id))
-    //   )
-    //   .subscribe((state) => {
-    //     if (this.wsService.isConnected) this.wsService.sendMessage(state);
-    //   });
   }
   ngOnDestroy() {
     this.destroy$.next();

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderNavComponent } from './header-nav.component';
+import { MatToolbar } from '@angular/material/toolbar';
 
 describe('HeaderNavComponent', () => {
   let component: HeaderNavComponent;
@@ -8,7 +9,8 @@ describe('HeaderNavComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HeaderNavComponent]
+      declarations: [HeaderNavComponent],
+      imports: [MatToolbar],
     });
     fixture = TestBed.createComponent(HeaderNavComponent);
     component = fixture.componentInstance;

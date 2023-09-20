@@ -53,13 +53,16 @@ export class AllListComponent {
     'volume_1day_usd',
     'favorite',
   ];
+  loadingRows: number[];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   private destroy$ = new Subject<void>();
 
   constructor(private store: Store<AppState>, private userApi: UserService) {
+    for (let i: number; i < 10; i++) {
+      this.loadingRows.push(i);
+    }
     this.mobileQuery = fromEvent<MediaQueryListEvent>(window, 'resize').pipe(
-      takeUntil(this.destroy$),
       map(() => window.matchMedia('(max-width: 780px)'))
     );
     this.store
@@ -96,7 +99,6 @@ export class AllListComponent {
         startWith(window.matchMedia('(max-width: 700px)')),
         takeUntil(this.destroy$)
       )
-
       .subscribe((query) => {
         this.displayedNamesColumns = query.matches
           ? ['asset_id_quote', 'price', 'favorite']
