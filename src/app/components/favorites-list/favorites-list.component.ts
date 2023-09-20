@@ -2,12 +2,26 @@ import { Constants } from 'src/assets/Constants';
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngrx/store';
-import { Subject, Subscription, takeUntil } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  delay,
+  filter,
+  isEmpty,
+  map,
+  skipUntil,
+  take,
+  takeUntil,
+} from 'rxjs';
 import { Favorite } from 'src/app/models/Favorite.interface';
 import { AppState } from 'src/app/store/app.state';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { selectFavoritesState } from 'src/app/store/selectors/favorites.selector';
+import {
+  selectFavoritesIds,
+  selectFavoritesState,
+} from 'src/app/store/selectors/favorites.selector';
 import {
   initPriceLive,
   updateHistoricalDataOnFavorite,
@@ -16,6 +30,7 @@ import { ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HistoricalData } from 'src/app/models/HistoricalData.interface';
 import { ChartDataset, tableParams } from './tableParams';
+import { LiveInfo } from 'src/app/models/Liveinfo.interface';
 
 @Component({
   selector: 'app-favorites-list',
@@ -25,7 +40,7 @@ import { ChartDataset, tableParams } from './tableParams';
 export class FavoritesListComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
-    private wsService: WebsocketService,
+    public wsService: WebsocketService,
     private _snackBar: MatSnackBar
   ) {}
   favorites: string[] = [];
@@ -36,11 +51,11 @@ export class FavoritesListComponent implements OnInit {
   };
   selectedFavorite: Favorite;
   selectedFav: Favorite;
-
   currencyPar: string = '';
   price: number = 0;
   change: number = 0;
   logo: string = '';
+  wsPrice$: Observable<number>;
   mobileQuery: MediaQueryList;
   private destroy$ = new Subject<void>();
 
@@ -55,12 +70,27 @@ export class FavoritesListComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   ngOnInit() {
+    // this.store.dispatch(initPriceLive());
+    this.wsPrice$ = this.wsService.connect().pipe(
+      takeUntil(this.destroy$),
+      map((state) => {
+        if (state.symbol_id === this.selectedFavorite?.symbol_id) {
+          return state.price;
+        } else {
+          return this.price;
+        }
+      })
+    );
     this.store
       .select(selectFavoritesState)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        filter((state) => state.length > 0)
+      )
       .subscribe((state) => {
         if (state.length > 0) {
           const favIds = state.map((fav) => fav.symbol_id);
+
           this.favorites = favIds;
           if (!this.selectedFavorite) {
             this.selectedFavorite = state[0];
@@ -78,11 +108,25 @@ export class FavoritesListComponent implements OnInit {
           }
         }
       });
+    // this.store
+    //   .select('favorites')
+    //   .pipe(
+    //     takeUntil(this.destroy$),
+    //     filter((state) => state.length > 0),
+    //     delay(600),
+    //     take(1),
+    //     map((fav) => fav.map((id) => id.symbol_id))
+    //   )
+    //   .subscribe((state) => {
+    //     if (this.wsService.isConnected) this.wsService.sendMessage(state);
+    //   });
   }
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    // if (this.wsService.isConnected) {
     this.wsService.closeConnection();
+    // }
   }
   onSelectedFavotire(event: Favorite) {
     if (event) {
@@ -98,12 +142,15 @@ export class FavoritesListComponent implements OnInit {
           event.asset_id_base + '/' + event.asset_id_quote
         );
       } else {
-        this._snackBar.open('No historical data found, try again...', 'OK', {
-          duration: 3000,
-        });
+        this._snackBar.open(
+          "We couldn't find recent historical data, loading...",
+          'OK',
+          {
+            duration: 3000,
+          }
+        );
       }
 
-      this.store.dispatch(initPriceLive());
       console.log('dataSet', this.dataSet);
     }
   }

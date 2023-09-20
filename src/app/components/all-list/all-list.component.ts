@@ -73,10 +73,15 @@ export class AllListComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
         this.userInfo = { ...state };
-        if (state?.favoritesIds && state?.favoritesIds.length > 0) {
-          console.log('veo la data para set userinfo', state.favoritesIds);
+        if (
+          state?.favoritesIds &&
+          state?.favoritesIds.length > 0 &&
+          !state.favoritesIds.every(
+            (id) => !this.favorites.includes(id.symbol_id)
+          )
+        ) {
           this.userApi.SetUserData({
-            ...this.userInfo,
+            ...state,
             favoritesIds: state.favoritesIds,
           });
         }
@@ -114,7 +119,7 @@ export class AllListComponent {
       });
   }
   getAllData() {
-    this.store.dispatch(LoadCurrencies());
+    // this.store.dispatch(LoadCurrencies());
   }
 
   onSelectFavotire(event: Currency) {

@@ -86,37 +86,28 @@ export class FavoritesEffects {
       })
     )
   );
-
-  initPriceUpdate$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(initPriceLive),
-      withLatestFrom(this.store.select((state) => state.favorites)),
-      switchMap(([action, favorites]) => {
-        if (favorites.length === 0) {
-          return EMPTY;
-        } else {
-          return this.wsService
-            .connect(favorites.map((favorite) => favorite.symbol_id))
-            .pipe(
-              concatMap((wsRes) => {
-                if (wsRes.symbol_id) {
-                  return of(
-                    // updatePriceOnFav({
-                    //   symbolId: wsRes.symbol_id,
-                    //   price: wsRes.price,
-                    // }),
-                    updateTradesData({ trades: wsRes })
-                  );
-                } else {
-                  return of(null);
-                }
-              }),
-              filter((actions) => actions !== null)
-            );
-        }
-      })
-    )
-  );
+  // initPriceUpdate$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(initPriceLive),
+  //     withLatestFrom(this.store.select((state) => state.favorites)),
+  //     concatMap(([action, favorites]) => {
+  //       return this.wsService
+  //         .connect(favorites.map((favorite) => favorite.symbol_id))
+  //         .pipe(
+  //           concatMap((wsRes) => {
+  //             return of(
+  //               // updatePriceOnFav({
+  //               //   symbolId: wsRes.symbol_id,
+  //               //   price: wsRes.price,
+  //               // }),
+  //               updateTradesData({ trades: wsRes })
+  //             );
+  //           }),
+  //           filter((actions) => actions !== null)
+  //         );
+  //     })
+  //   )
+  // );
 
   updateHistoricalData$ = createEffect(() => {
     return this.actions$.pipe(

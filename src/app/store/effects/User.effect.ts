@@ -24,7 +24,6 @@ export class UserEffects {
                 ? userFS.data()?.favoritesIds
                 : [],
             };
-
             return concat(
               of({
                 type: updateFavoritesFromFS.type,

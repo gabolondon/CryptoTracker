@@ -16,9 +16,15 @@
       </div>
     </div>
     <div class="h-10 text-left lg:text-right text-slate-600 text-md/[18px] flex flex-col ">
-      <div class=" overflow-x-auto" [@growAnimation]="(wsPrice$ | async ).wsprice">{{((wsPrice$ | async ) |
+
+      <div class=" flex items-center" [@growAnimation]="(wsPrice$ | async )">
+        <div *ngIf="(wsPrice$ | async ) === null" class="h-[20px] w-[50px] animate-pulse rounded-lg bg-blue-200 mr-2">
+        </div>
+        {{((wsPrice$ | async ) |
         currency:'USD':'symbol-narrow':'1.2-4'
-        )}} USD</div>
+        )}} USD
+      </div>
+
       <div class=" change-percent text-sm align-center" [ngStyle]="{color: change > 0 ? 'green' : 'red'}">
         {{change | percent: '1.1-2'}} 24h
       </div>

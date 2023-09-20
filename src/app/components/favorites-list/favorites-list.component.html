@@ -32,7 +32,7 @@
           <div class="flex items-center">
             <div class="mx-2 text-slate-600">
               {{
-              price || 123456 | currency : "USD" : "symbol-narrow" : "1.2-4"
+              (wsPrice$ | async) | currency : "USD" : "symbol-narrow" : "1.2-4"
               }}
               USD
             </div>

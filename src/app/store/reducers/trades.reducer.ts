@@ -9,7 +9,7 @@ export const tradesReducer = createReducer(
   initialState,
   on(updateTradesData, (state, { trades }) => {
     const newState = [trades, ...state];
-    if (newState.length > 1000) {
+    if (newState.length > 50) {
       newState.pop();
     }
     return newState;
