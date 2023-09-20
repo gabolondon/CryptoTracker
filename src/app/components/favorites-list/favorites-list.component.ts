@@ -70,11 +70,11 @@ export class FavoritesListComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   ngOnInit() {
-    // this.store.dispatch(initPriceLive());
+    console.log('init favorites list');
     this.wsService
       .connect()
       .pipe(
-        takeUntil(this.destroy$),
+        delay(100),
         map((state) => {
           if (state.symbol_id === this.selectedFavorite?.symbol_id) {
             return state.price;
@@ -88,10 +88,7 @@ export class FavoritesListComponent implements OnInit {
       });
     this.store
       .select(selectFavoritesState)
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((state) => state.length > 0)
-      )
+      .pipe(filter((state) => state.length > 0))
       .subscribe((state) => {
         if (state.length > 0) {
           const favIds = state.map((fav) => fav.symbol_id);
@@ -117,9 +114,10 @@ export class FavoritesListComponent implements OnInit {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    // if (this.wsService.isConnected) {
     this.wsService.closeConnection();
-    // }
+  }
+  trackByFn(index, item) {
+    return item.symbol_id;
   }
   onSelectedFavotire(event: Favorite) {
     if (event) {
@@ -143,8 +141,6 @@ export class FavoritesListComponent implements OnInit {
           }
         );
       }
-
-      console.log('dataSet', this.dataSet);
     }
   }
   updateChartData(updatedData: HistoricalData[], label: string) {

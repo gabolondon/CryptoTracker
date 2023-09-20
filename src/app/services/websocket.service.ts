@@ -20,18 +20,10 @@ export class WebsocketService {
       .select(selectFavoritesIds)
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
-        console.log('watch the ids on wsservice', state);
         this.hsMessage = state;
       });
   }
   hsMessage: string[];
-  // handShakeMessage = {
-  //     type: 'hello',
-  //     apikey: environment.API_KEY,
-  //     heartbeat: false,
-  //     subscribe_data_type: ['trade'],
-  //     subscribe_filter_symbol_id: message,
-  //   };
   public connect(): WebSocketSubject<any> {
     if (!this.socket$ || this.socket$.closed) {
       this.socket$ = webSocket({
@@ -66,42 +58,4 @@ export class WebsocketService {
   sendMessage(msg: any) {
     this.socket$.next(msg);
   }
-
-  // public socket: WebSocket;
-  // isConnected: boolean = false;
-  // msgres: LiveInfo;
-
-  // constructor(private store: Store<AppState>) {}
-
-  // public connect(initSymbols: string[]): Observable<LiveInfo> {
-  //   this.socket = new WebSocket('wss://ws.coinapi.io/v1/');
-  //   return new Observable((observer) => {
-  //     this.socket.onopen = () => {
-  //       console.log('ws connection established');
-  //       this.isConnected = true;
-  //       this.sendMessage(initSymbols);
-  //     };
-  //     this.socket.onmessage = (event) => observer.next(JSON.parse(event.data));
-  //     this.socket.onerror = (event) => observer.error(event);
-  //     this.socket.onclose = () => observer.complete();
-  //   });
-  // }
-  // msg(): Observable<LiveInfo> {
-  //   return of(this.msgres);
-  // }
-  // sendMessage(message): void {
-  //   const handShakeMessage = {
-  //     type: 'hello',
-  //     apikey: environment.API_KEY,
-  //     heartbeat: false,
-  //     subscribe_data_type: ['trade'],
-  //     subscribe_filter_symbol_id: message,
-  //   };
-
-  //   this.socket.send(JSON.stringify(handShakeMessage));
-  // }
-
-  // closeConnection(): void {
-  //   this.socket.close();
-  // }
 }

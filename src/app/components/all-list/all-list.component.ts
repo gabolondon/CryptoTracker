@@ -128,9 +128,9 @@ export class AllListComponent {
     if (this.favorites.find((fav) => fav === event.symbol_id)) {
       this.favorites = this.favorites.filter((fav) => fav !== event.symbol_id);
       this.store.dispatch(removeFavorite({ symbolId: event.symbol_id }));
-      this.store.dispatch(
-        removeFavoriteOnCurrency({ symbolId: event.symbol_id })
-      );
+      // this.store.dispatch(
+      //   removeFavoriteOnCurrency({ symbolId: event.symbol_id })
+      // );
     } else {
       this.favorites.push(event.symbol_id);
       this.store.dispatch(
@@ -146,7 +146,7 @@ export class AllListComponent {
         })
       );
 
-      this.store.dispatch(addFavoriteOnCurrency({ symbolId: event.symbol_id }));
+      // this.store.dispatch(addFavoriteOnCurrency({ symbolId: event.symbol_id }));
     }
     console.log(this.favorites);
   }

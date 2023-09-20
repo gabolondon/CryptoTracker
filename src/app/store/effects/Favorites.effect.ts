@@ -32,6 +32,10 @@ import {
   addFavoriteToUser,
   removeFavoriteToUser,
 } from '../actions/user.action';
+import {
+  addFavoriteOnCurrency,
+  removeFavoriteOnCurrency,
+} from '../actions/currencies.action';
 
 @Injectable()
 export class FavoritesEffects {
@@ -39,38 +43,39 @@ export class FavoritesEffects {
     this.actions$.pipe(
       ofType(addFavorite),
       mergeMap((action) => {
-        // const favoriteExists = action.favorite?.last_day_info;
-
-        // if (favoriteExists) {
-        //   return EMPTY;
-        // } else {
-        return this.currencyService
-          .getHistoricalData(action.favorite.symbol_id)
-          .pipe(
-            concatMap((currencies) => {
-              return (
-                of({
-                  type: addFavoriteData.type,
-                  favorite: {
-                    ...action.favorite,
-                    last_day_info: currencies[currencies.length - 1],
-                    historical_data: currencies,
-                  },
-                }),
-                of({
-                  type: addFavoriteToUser.type,
-                  favId: {
-                    ...action.favorite,
-                    last_day_info: currencies[currencies.length - 1],
-                  },
-                })
-              );
-            }),
-            catchError(() => {
-              console.log('error');
-              return EMPTY;
-            })
-          );
+        return (
+          this.currencyService
+            .getHistoricalData(action.favorite.symbol_id)
+            .pipe(
+              concatMap((currencies) => {
+                return (
+                  of({
+                    type: addFavoriteData.type,
+                    favorite: {
+                      ...action.favorite,
+                      last_day_info: currencies[currencies.length - 1],
+                      historical_data: currencies,
+                    },
+                  }),
+                  of({
+                    type: addFavoriteToUser.type,
+                    favId: {
+                      ...action.favorite,
+                      last_day_info: currencies[currencies.length - 1],
+                    },
+                  })
+                );
+              }),
+              catchError(() => {
+                console.log('error');
+                return EMPTY;
+              })
+            ),
+          of({
+            type: addFavoriteOnCurrency.type,
+            symbolId: action.favorite.symbol_id,
+          })
+        );
         // }
       })
     )
@@ -78,11 +83,17 @@ export class FavoritesEffects {
   removeFavorite$ = createEffect(() =>
     this.actions$.pipe(
       ofType(removeFavorite),
-      mergeMap((action) => {
-        return of({
-          type: removeFavoriteToUser.type,
-          favId: action.symbolId,
-        });
+      concatMap((action) => {
+        return (
+          of({
+            type: removeFavoriteToUser.type,
+            favId: action.symbolId,
+          }),
+          of({
+            type: removeFavoriteOnCurrency.type,
+            symbolId: action.symbolId,
+          })
+        );
       })
     )
   );

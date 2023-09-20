@@ -15,7 +15,6 @@ export class DashboardComponent {
   shouldRun = true;
 
   onShowDrawer($event) {
-    console.log('toggle drawer');
     this.showDrawer = !this.showDrawer;
   }
   mobileQuery: MediaQueryList;
@@ -24,6 +23,7 @@ export class DashboardComponent {
 
   constructor(
     changeDetectorRef: ChangeDetectorRef,
+    private router: Router,
     media: MediaMatcher,
     private store: Store<AppState>
   ) {
@@ -33,6 +33,8 @@ export class DashboardComponent {
   }
   ngOnInit(): void {
     this.store.dispatch(LoadCurrencies());
+
+    this.router.navigate(['/dashboard/favorites']);
   }
 
   ngOnDestroy(): void {

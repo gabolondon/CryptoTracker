@@ -1,5 +1,5 @@
 <div (click)="onFavClicked($event)" [@clickAnimation]="isClicked"
-  class="p-4 mb-2 rounded-lg container bg-white flex items-center w-full drop-shadow-lg hover:bg-slate-100 ">
+  class="pl-3 pr-1 py-3 mb-2 rounded-lg container bg-white flex items-center w-full drop-shadow-lg hover:bg-slate-100 ">
   <div class="h-10 w-10 min-w-[36px] mr-2 mt-1px flex items-center">
     <ng-container *ngIf="logo !== ''; else progressSpinner">
       <img width="36" height="36" src="{{logo}}" alt="crypto logo">
@@ -30,6 +30,11 @@
       </div>
     </div>
 
+  </div>
+  <div class=" ">
+    <button mat-icon-button (click)="onDeleteFav()">
+      <mat-icon class="mat-18" color="warn">delete</mat-icon>
+    </button>
   </div>
 
 </div>

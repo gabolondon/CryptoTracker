@@ -51,7 +51,6 @@ export class SideNavComponent {
         takeUntil(this.destroy$)
       )
       .subscribe((url) => {
-        console.log(url);
         this.selected = url;
       });
   }

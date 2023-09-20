@@ -7,12 +7,13 @@ import {
   Output,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { Observable, Subject, delay, map, takeUntil } from 'rxjs';
 import { Favorite } from 'src/app/models/Favorite.interface';
 import { AppState } from 'src/app/store/app.state';
 import { Constants } from 'src/assets/Constants';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { WebsocketService } from 'src/app/services/websocket.service';
+import { removeFavorite } from 'src/app/store/actions/favorites.action';
 
 @Component({
   selector: 'app-favorite-card',
@@ -68,7 +69,7 @@ export class FavoriteCardComponent implements OnInit {
     //   })
     // );
     this.wsPrice$ = this.wsServer.dataUpdates$().pipe(
-      takeUntil(this.destroy$),
+      delay(100),
       map((state) => {
         if (state.symbol_id === this.favoriteId) {
           this.prevPrice = state.price;
@@ -96,10 +97,13 @@ export class FavoriteCardComponent implements OnInit {
       });
   }
 
+  onDeleteFav() {
+    this.store.dispatch(removeFavorite({ symbolId: this.favoriteId }));
+  }
+
   onFavClicked($event) {
     if ($event) {
       this.isClicked = !this.isClicked;
-      console.log('pressed fav', this.favProperties);
       this.selectFavotire.emit(this.favProperties);
     }
   }

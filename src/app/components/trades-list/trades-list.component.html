@@ -1,6 +1,7 @@
 <div class="flex mt-4 bg-white py-4 border-t border-slate-200 rounded-b-3xl min-h-[230px]">
   <mat-list dense class="flex h-[250px] border-r border-slate-200 w-1/2 mx-1 rounded-l-2xl overflow-y-auto">
-    <mat-list-item *ngFor="let trade of buyTrades" class="">
+
+    <mat-list-item *ngFor="let trade of buyTrades; trackBy: trackByFnBuy" class="">
       <div class="flex justify-between">
         <div class="mr-2 text-left text-green-500 text-xs flex flex-col">
           <span class="font-bold">{{trade.price | currency:'USD':'symbol-narrow':'1.2-4'}}</span>
@@ -17,7 +18,7 @@
 
   </mat-list>
   <mat-list dense class="flex h-[250px] w-1/2 mx-1  rounded-r-2xl overflow-y-auto">
-    <mat-list-item *ngFor="let trade of sellTrades" class="">
+    <mat-list-item *ngFor="let trade of sellTrades; trackBy: trackByFnSell" class="">
       <div class="flex justify-between">
         <div class="mr-2 text-left text-red-500 text-xs flex flex-col">
           <span class="font-bold">{{trade.price ||26.2399 | currency:'USD':'symbol-narrow':'1.2-4'}}</span>
