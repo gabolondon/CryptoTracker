@@ -21,7 +21,7 @@ export class WebsocketService {
       .select(selectFavoritesIds)
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
-        if (state.length > 0 && this.socket$.observed) {
+        if (state.length > 0 && this.socket$?.observed) {
           this.socket$.next(state);
         } else {
           this.hsMessage = state;
@@ -41,7 +41,7 @@ export class WebsocketService {
               apikey: environment.API_KEY,
               heartbeat: false,
               subscribe_data_type: ['trade'],
-              subscribe_filter_symbol_id: 'null',
+              subscribe_filter_symbol_id: this.hsMessage,
             });
           },
         },

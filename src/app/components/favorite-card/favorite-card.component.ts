@@ -55,19 +55,19 @@ export class FavoriteCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.wsPrice$ = this.wsServer.dataUpdates$().pipe(
-    //   takeUntil(this.destroy$),
+    this.wsPrice$ = this.wsServer.dataUpdates$().pipe(
+      takeUntil(this.destroy$),
 
-    //   delay(100),
-    //   map((state) => {
-    //     if (state.symbol_id === this.favoriteId) {
-    //       this.prevPrice = state.price;
-    //       return state.price;
-    //     } else {
-    //       return this.prevPrice;
-    //     }
-    //   })
-    // );
+      delay(100),
+      map((state) => {
+        if (state.symbol_id === this.favoriteId) {
+          this.prevPrice = state.price;
+          return state.price;
+        } else {
+          return this.prevPrice;
+        }
+      })
+    );
 
     this.store.select('favorites').subscribe((state) => {
       const fav = state.find((f) => f.symbol_id === this.favoriteId);

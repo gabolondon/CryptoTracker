@@ -30,7 +30,6 @@ import { ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HistoricalData } from 'src/app/models/HistoricalData.interface';
 import { ChartDataset, tableParams } from './tableParams';
-import { LiveInfo } from 'src/app/models/Liveinfo.interface';
 
 @Component({
   selector: 'app-favorites-list',
@@ -40,8 +39,7 @@ import { LiveInfo } from 'src/app/models/Liveinfo.interface';
 export class FavoritesListComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
-    public wsService: WebsocketService,
-    private _snackBar: MatSnackBar
+    public wsService: WebsocketService
   ) {}
   favorites: string[] = [];
   dataSet: ChartDataset = {
@@ -87,26 +85,6 @@ export class FavoritesListComponent implements OnInit {
       });
   }
   ngAfterViewInit() {
-    // this.store
-    //   .select(selectFavoritesIds)
-    //   .pipe(takeUntil(this.wsService.dataUpdates$()))
-    //   .subscribe((state) => {
-    //     this.wsService
-    //       .connect()
-    //       .pipe(
-    //         delay(100),
-    //         map((state) => {
-    //           if (state.symbol_id === this.selectedFavorite?.symbol_id) {
-    //             return state.price;
-    //           } else {
-    //             return this.price;
-    //           }
-    //         })
-    //       )
-    //       .subscribe((price) => {
-    //         this.price = price;
-    //       });
-    //   });
     this.store
       .select(selectFavoritesState)
       .pipe(

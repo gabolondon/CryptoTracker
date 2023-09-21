@@ -1,11 +1,12 @@
-<div class="px-4 py-2 max-w-4xl mx-auto bg-[#f9fbfc] rounded-3xl drop-shadow-md lg:rounded-none lg:drop-shadow-none "
+<div
+  class="px-4 py-2 max-w-4xl mx-auto bg-[#f9fbfc] rounded-3xl drop-shadow-md h-full lg:rounded-none lg:drop-shadow-none "
   [@fadeInOnEnter]>
   <mat-form-field class="w-2/3 max-w-sm" appearance="outline">
     <mat-icon matPrefix class="text-[#2969ce]">search</mat-icon>
     <input matInput (keyup)="applyFilter($event)" class="w-full fomrfield" placeholder="Search a currency" #input>
   </mat-form-field>
   <div class="mb-6 p-4  w-full bg-[#2969ce] rounded-3xl">
-    <div class="text-white flex flex-col-reverse md:flex-row">
+    <div class="text-white flex items-center justify-center flex-col-reverse md:flex-row">
       <div class="p-2 m-2">
 
         <span class="text-3xl font-bold text-slate-200 mb-2">Crypto Tracker by GLdev! <br /></span>
