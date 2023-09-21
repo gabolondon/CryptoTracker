@@ -118,7 +118,10 @@ export class AllListComponent {
   }
 
   onSelectFavotire(event: Currency) {
-    if (this.favorites.find((fav) => fav === event.symbol_id)) {
+    if (
+      this.favorites &&
+      this.favorites.find((fav) => fav === event.symbol_id)
+    ) {
       this.favorites = this.favorites.filter((fav) => fav !== event.symbol_id);
       this.store.dispatch(removeFavorite({ symbolId: event.symbol_id }));
       this.store.dispatch(

@@ -2,30 +2,12 @@ import { Constants } from 'src/assets/Constants';
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngrx/store';
-import {
-  Observable,
-  Subject,
-  Subscription,
-  delay,
-  filter,
-  isEmpty,
-  map,
-  skipUntil,
-  take,
-  takeUntil,
-} from 'rxjs';
+import { Observable, Subject, delay, filter, map, takeUntil } from 'rxjs';
 import { Favorite } from 'src/app/models/Favorite.interface';
 import { AppState } from 'src/app/store/app.state';
 import { WebsocketService } from 'src/app/services/websocket.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  selectFavoritesIds,
-  selectFavoritesState,
-} from 'src/app/store/selectors/favorites.selector';
-import {
-  initPriceLive,
-  updateHistoricalDataOnFavorite,
-} from 'src/app/store/actions/favorites.action';
+import { selectFavoritesState } from 'src/app/store/selectors/favorites.selector';
+import { updateHistoricalDataOnFavorite } from 'src/app/store/actions/favorites.action';
 import { ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HistoricalData } from 'src/app/models/HistoricalData.interface';

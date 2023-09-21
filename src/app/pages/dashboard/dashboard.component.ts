@@ -25,7 +25,8 @@ export class DashboardComponent {
   constructor(
     changeDetectorRef: ChangeDetectorRef,
     media: MediaMatcher,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private router: Router
   ) {
     this.mobileQuery = media.matchMedia('(max-width: 720px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
@@ -33,6 +34,11 @@ export class DashboardComponent {
   }
   ngOnInit(): void {
     this.store.dispatch(LoadCurrencies());
+    this.store.select('favorites').subscribe((state) => {
+      if (state.length === 0) {
+        this.router.navigate(['/dashboard/favorites']);
+      }
+    });
   }
 
   ngOnDestroy(): void {
