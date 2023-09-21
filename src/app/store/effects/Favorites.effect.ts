@@ -4,34 +4,24 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, of } from 'rxjs';
 import {
   map,
-  exhaustMap,
   catchError,
   mergeMap,
   withLatestFrom,
-  mergeAll,
-  switchMap,
-  filter,
   concatMap,
-  take,
 } from 'rxjs/operators';
 import { CurrencyApiService } from 'src/app/services/currency-api.service';
 import { Store, props } from '@ngrx/store';
 import { AppState } from 'src/app/store/app.state';
-import { CurrencyState } from 'src/app/models/Currency.state';
 import {
   addFavorite,
   addFavoriteData,
-  initPriceLive,
   updateHistoricalDataOnFavorite,
-  updatePriceOnFav,
 } from '../actions/favorites.action';
-import { Constants } from 'src/assets/Constants';
-import { WebsocketService } from 'src/app/services/websocket.service';
-import { updateTradesData } from '../actions/trades.action';
 import {
   addFavoriteToUser,
   removeFavoriteToUser,
 } from '../actions/user.action';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class FavoritesEffects {
@@ -39,11 +29,6 @@ export class FavoritesEffects {
     this.actions$.pipe(
       ofType(addFavorite),
       mergeMap((action) => {
-        // const favoriteExists = action.favorite?.last_day_info;
-
-        // if (favoriteExists) {
-        //   return EMPTY;
-        // } else {
         return this.currencyService
           .getHistoricalData(action.favorite.symbol_id)
           .pipe(
@@ -67,7 +52,7 @@ export class FavoritesEffects {
               );
             }),
             catchError(() => {
-              console.log('error');
+              console.log('error addFavorite$ ');
               return EMPTY;
             })
           );
@@ -128,7 +113,7 @@ export class FavoritesEffects {
               },
             })),
             catchError(() => {
-              console.log('error');
+              console.log('error updateHistoricalData$');
               return EMPTY;
             })
           );
@@ -142,7 +127,7 @@ export class FavoritesEffects {
   constructor(
     private actions$: Actions,
     private currencyService: CurrencyApiService,
-    private wsService: WebsocketService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private _snackBar: MatSnackBar
   ) {}
 }

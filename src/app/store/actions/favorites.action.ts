@@ -17,7 +17,6 @@ export const removeFavorite = createAction(
 );
 
 export const initPriceLive = createAction('[Favorites] Init Price Live');
-// export const killPriceLive = createAction('[Favorites] Kill Price Live');
 export const updatePriceOnFav = createAction(
   '[Favorites] Update Price On Fav',
   props<{ symbolId: string; price: number }>()

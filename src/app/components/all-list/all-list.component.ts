@@ -1,5 +1,5 @@
 import { UserService } from './../../services/user.service';
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { MatPaginator } from '@angular/material/paginator';
@@ -53,18 +53,15 @@ export class AllListComponent {
     'volume_1day_usd',
     'favorite',
   ];
-  loadingRows: number[];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   private destroy$ = new Subject<void>();
 
   constructor(private store: Store<AppState>, private userApi: UserService) {
-    for (let i: number; i < 10; i++) {
-      this.loadingRows.push(i);
-    }
     this.mobileQuery = fromEvent<MediaQueryListEvent>(window, 'resize').pipe(
       map(() => window.matchMedia('(max-width: 780px)'))
     );
+
     this.store
       .select(selectFavoritesIds)
       .pipe(takeUntil(this.destroy$))
@@ -92,8 +89,6 @@ export class AllListComponent {
   }
 
   ngOnInit(): void {
-    this.getAllData();
-
     this.mobileQuery
       .pipe(
         startWith(window.matchMedia('(max-width: 700px)')),
@@ -104,7 +99,8 @@ export class AllListComponent {
           ? ['asset_id_quote', 'price', 'favorite']
           : ['asset_id_quote', 'price', 'volume_1day_usd', 'favorite'];
       });
-
+  }
+  ngAfterViewInit() {
     this.store
       .select(selectCurrenciesState)
       .pipe(takeUntil(this.destroy$))
@@ -119,9 +115,6 @@ export class AllListComponent {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       });
-  }
-  getAllData() {
-    // this.store.dispatch(LoadCurrencies());
   }
 
   onSelectFavotire(event: Currency) {

@@ -7,7 +7,7 @@ import {
   Output,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, map, takeUntil } from 'rxjs';
+import { Observable, Subject, delay, map, takeUntil } from 'rxjs';
 import { Favorite } from 'src/app/models/Favorite.interface';
 import { AppState } from 'src/app/store/app.state';
 import { Constants } from 'src/assets/Constants';
@@ -55,45 +55,32 @@ export class FavoriteCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.wsPrice$ = this.store.select('trades').pipe(
+    // this.wsPrice$ = this.wsServer.dataUpdates$().pipe(
     //   takeUntil(this.destroy$),
+
+    //   delay(100),
     //   map((state) => {
-    //     const priceInfo = state.find((f) => f.symbol_id === this.favoriteId);
-    //     if (priceInfo) {
-    //       this.prevPrice = priceInfo.price;
-    //       return priceInfo.price;
+    //     if (state.symbol_id === this.favoriteId) {
+    //       this.prevPrice = state.price;
+    //       return state.price;
     //     } else {
     //       return this.prevPrice;
     //     }
     //   })
     // );
-    this.wsPrice$ = this.wsServer.dataUpdates$().pipe(
-      takeUntil(this.destroy$),
-      map((state) => {
-        if (state.symbol_id === this.favoriteId) {
-          this.prevPrice = state.price;
-          return state.price;
-        } else {
-          return this.prevPrice;
-        }
-      })
-    );
 
-    this.store
-      .select('favorites')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((state) => {
-        const fav = state.find((f) => f.symbol_id === this.favoriteId);
-        if (fav) {
-          this.currencyPar = fav?.asset_id_quote + '/' + fav?.asset_id_base;
-          this.prevPrice = fav?.price;
-          this.favProperties = fav;
-          this.change = this.prevPrice / fav.last_day_info?.price_open - 1;
-          this.logo = Constants.symbols.find(
-            (s) => s.asset_id === fav?.asset_id_base
-          ).url;
-        }
-      });
+    this.store.select('favorites').subscribe((state) => {
+      const fav = state.find((f) => f.symbol_id === this.favoriteId);
+      if (fav) {
+        this.currencyPar = fav?.asset_id_quote + '/' + fav?.asset_id_base;
+        this.prevPrice = fav?.price;
+        this.favProperties = fav;
+        this.change = this.prevPrice / fav.last_day_info?.price_open - 1;
+        this.logo = Constants.symbols.find(
+          (s) => s.asset_id === fav?.asset_id_base
+        ).url;
+      }
+    });
   }
 
   onFavClicked($event) {
@@ -102,5 +89,11 @@ export class FavoriteCardComponent implements OnInit {
       console.log('pressed fav', this.favProperties);
       this.selectFavotire.emit(this.favProperties);
     }
+  }
+
+  ngOnDestroy() {
+    this.wsServer.closeConnection();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

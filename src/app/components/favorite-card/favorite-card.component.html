@@ -18,7 +18,7 @@
     <div class="h-10 text-left lg:text-right text-slate-600 text-md/[18px] flex flex-col ">
 
       <div class=" flex items-center" [@growAnimation]="(wsPrice$ | async )">
-        <div *ngIf="(wsPrice$ | async ) === null" class="h-[20px] w-[50px] animate-pulse rounded-lg bg-blue-200 mr-2">
+        <div *ngIf="(wsPrice$ | async ) === null" class="h-[20px] w-[50px] animate-pulse rounded-lg bg-blue-300 mr-2">
         </div>
         {{((wsPrice$ | async ) |
         currency:'USD':'symbol-narrow':'1.2-4'

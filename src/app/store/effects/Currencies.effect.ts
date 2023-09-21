@@ -15,6 +15,7 @@ import { Store, props } from '@ngrx/store';
 import { AppState } from 'src/app/store/app.state';
 import { CurrencyState } from 'src/app/models/Currency.state';
 import { LoadCurrencies, getAllCurrencies } from '../actions/currencies.action';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable()
 export class CurrenciesEffects {
@@ -40,7 +41,14 @@ export class CurrenciesEffects {
           })),
 
           catchError(() => {
-            console.log('error');
+            this._snackBar.open(
+              'There is a problem with CoinApi, please try again',
+              'Close',
+              {
+                duration: 2000,
+              }
+            );
+            console.log('error on loadCurrencies$ ');
             return EMPTY;
           })
         )
@@ -51,6 +59,7 @@ export class CurrenciesEffects {
   constructor(
     private actions$: Actions,
     private currencyService: CurrencyApiService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private _snackBar: MatSnackBar
   ) {}
 }

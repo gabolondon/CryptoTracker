@@ -1,5 +1,5 @@
 import { Constants } from 'src/assets/Constants';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import {
@@ -70,11 +70,10 @@ export class FavoritesListComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   ngOnInit() {
-    // this.store.dispatch(initPriceLive());
     this.wsService
       .connect()
       .pipe(
-        takeUntil(this.destroy$),
+        delay(100),
         map((state) => {
           if (state.symbol_id === this.selectedFavorite?.symbol_id) {
             return state.price;
@@ -86,6 +85,28 @@ export class FavoritesListComponent implements OnInit {
       .subscribe((price) => {
         this.price = price;
       });
+  }
+  ngAfterViewInit() {
+    // this.store
+    //   .select(selectFavoritesIds)
+    //   .pipe(takeUntil(this.wsService.dataUpdates$()))
+    //   .subscribe((state) => {
+    //     this.wsService
+    //       .connect()
+    //       .pipe(
+    //         delay(100),
+    //         map((state) => {
+    //           if (state.symbol_id === this.selectedFavorite?.symbol_id) {
+    //             return state.price;
+    //           } else {
+    //             return this.price;
+    //           }
+    //         })
+    //       )
+    //       .subscribe((price) => {
+    //         this.price = price;
+    //       });
+    //   });
     this.store
       .select(selectFavoritesState)
       .pipe(
@@ -117,9 +138,7 @@ export class FavoritesListComponent implements OnInit {
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
-    // if (this.wsService.isConnected) {
     this.wsService.closeConnection();
-    // }
   }
   onSelectedFavotire(event: Favorite) {
     if (event) {
@@ -128,23 +147,10 @@ export class FavoritesListComponent implements OnInit {
         updateHistoricalDataOnFavorite({ symbolId: event.symbol_id })
       );
       this.filterLiveData(event);
-
-      if (event.historical_data?.length > 0) {
-        this.updateChartData(
-          event.historical_data,
-          event.asset_id_base + '/' + event.asset_id_quote
-        );
-      } else {
-        this._snackBar.open(
-          "We couldn't find recent historical data, loading...",
-          'OK',
-          {
-            duration: 3000,
-          }
-        );
-      }
-
-      console.log('dataSet', this.dataSet);
+      this.updateChartData(
+        event.historical_data ? event.historical_data : [],
+        event.asset_id_base + '/' + event.asset_id_quote
+      );
     }
   }
   updateChartData(updatedData: HistoricalData[], label: string) {
@@ -175,5 +181,13 @@ export class FavoritesListComponent implements OnInit {
         (s) => s.asset_id === favorite?.asset_id_base
       )?.url;
     }
+  }
+
+  trackFavorites(index: number, favorite: Favorite) {
+    return favorite.symbol_id;
+  }
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnload(e: Event) {
+    this.ngOnDestroy();
   }
 }

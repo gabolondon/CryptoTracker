@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subject, of, takeUntil } from 'rxjs';
+import { Observable, Subject, delay, of, takeUntil } from 'rxjs';
 import { LiveInfo } from 'src/app/models/Liveinfo.interface';
 import { WebsocketService } from 'src/app/services/websocket.service';
 import { AppState } from 'src/app/store/app.state';
@@ -9,49 +9,60 @@ import { AppState } from 'src/app/store/app.state';
   selector: 'app-trades-list',
   templateUrl: './trades-list.component.html',
   styleUrls: ['./trades-list.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TradesListComponent {
   buyTrades: LiveInfo[] = [];
-  testing: string[] = ['1', '2', '3', '4'];
   sellTrades: LiveInfo[];
-  desttoy$: Subject<void> = new Subject<void>();
+  destroy$: Subject<void> = new Subject<void>();
   tradesInfo: LiveInfo[] = [];
 
+  constructor(private wsService: WebsocketService) {}
+
   @Input() symbolId: string;
-  constructor(private wsService: WebsocketService) {
+  ngOnInit() {
     this.wsService
       .dataUpdates$()
-      .pipe(takeUntil(this.desttoy$))
+      .pipe(delay(100), takeUntil(this.destroy$))
       .subscribe((data) => {
-        if (this.tradesInfo.length > 1000) {
-          this.tradesInfo.pop();
+        if (data?.symbol_id) {
+          if (this.tradesInfo.length > 1000) {
+            this.tradesInfo.pop();
+          }
+          this.tradesInfo.unshift(data);
+          this.filterBuySel();
         }
-        this.tradesInfo.unshift(data);
-        this.filterBuySel();
       });
   }
 
   ngOnChanges() {
-    this.filterBuySel();
+    if (this.tradesInfo.length > 0) {
+      this.filterBuySel();
+    }
   }
 
-  filterBuySel() {
-    const symbolTrades = this.tradesInfo
-      .filter((trade) => trade.symbol_id === this.symbolId)
-      .map((trade) => {
-        return {
-          ...trade,
-          symbol_id: this.capitalizeFirstWord(trade.symbol_id),
-        };
-      });
-    this.buyTrades = symbolTrades.filter((trade) => trade.taker_side === 'BUY');
-    this.sellTrades = symbolTrades.filter(
-      (trade) => trade.taker_side === 'SELL'
-    );
+  filterBuySel(): void {
+    if (this.tradesInfo.length > 0) {
+      console.log('filterBuySel', this.symbolId);
+      const symbolTrades = this.tradesInfo
+        .filter((trade) => trade.symbol_id === this.symbolId)
+        .map((trade) => {
+          return {
+            ...trade,
+            symbol_id: this.capitalizeFirstWord(trade.symbol_id),
+          };
+        });
+
+      this.buyTrades = symbolTrades.filter(
+        (trade) => trade.taker_side === 'BUY'
+      );
+      this.sellTrades = symbolTrades.filter(
+        (trade) => trade.taker_side === 'SELL'
+      );
+    }
   }
 
-  capitalizeFirstWord(str: string) {
+  capitalizeFirstWord(str: string): string {
     if (!str || str === '') {
       return '';
     }
@@ -62,8 +73,9 @@ export class TradesListComponent {
     const firstWord = words[0].charAt(0).toUpperCase() + words[0].slice(1);
     return firstWord;
   }
+
   ngOnDestroy() {
-    this.desttoy$.next();
-    this.desttoy$.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

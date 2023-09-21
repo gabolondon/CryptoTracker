@@ -8,7 +8,6 @@ import { Component } from '@angular/core';
 export class HomeComponent {
   constructor(private router: Router) {}
   onClick(event: any) {
-    console.log('clicked');
     this.router.navigate(['favorites']);
   }
 }

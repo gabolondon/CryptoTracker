@@ -4,8 +4,8 @@
       class="p-4 mb-4 mx-2 mx-auto w-full lg:w-2/6 min-w-[300px] max-w-[600px] rounded-2xl lg:rounded-sm items-center bg-[#f9fbfc] drop-shadow ">
       <span class="text-lg font-bold text-slate-600 mb-2">Your Favorites</span>
       <div class="scroll-container mx-2 mb-2 overflow-x-auto max-h-screen">
-        <app-favorite-card (selectFavotire)="onSelectedFavotire($event)" *ngFor="let favorite of favorites"
-          [favoriteId]="favorite"></app-favorite-card>
+        <app-favorite-card (selectFavotire)="onSelectedFavotire($event)"
+          *ngFor="let favorite of favorites; trackBy trackFavorites" [favoriteId]="favorite"></app-favorite-card>
       </div>
     </div>
     <div

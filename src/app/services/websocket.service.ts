@@ -12,6 +12,7 @@ import { selectFavoritesIds } from '../store/selectors/favorites.selector';
 })
 export class WebsocketService {
   socket$: WebSocketSubject<any>;
+  isConnected: boolean = false;
 
   private destroy$ = new Subject<void>();
 
@@ -20,19 +21,16 @@ export class WebsocketService {
       .select(selectFavoritesIds)
       .pipe(takeUntil(this.destroy$))
       .subscribe((state) => {
-        console.log('watch the ids on wsservice', state);
-        this.hsMessage = state;
+        if (state.length > 0 && this.socket$.observed) {
+          this.socket$.next(state);
+        } else {
+          this.hsMessage = state;
+        }
       });
   }
-  hsMessage: string[];
-  // handShakeMessage = {
-  //     type: 'hello',
-  //     apikey: environment.API_KEY,
-  //     heartbeat: false,
-  //     subscribe_data_type: ['trade'],
-  //     subscribe_filter_symbol_id: message,
-  //   };
+  hsMessage: string[] = [];
   public connect(): WebSocketSubject<any> {
+    console.log('watch the ids on wsservice', this.hsMessage);
     if (!this.socket$ || this.socket$.closed) {
       this.socket$ = webSocket({
         url: 'wss://ws.coinapi.io/v1/',
@@ -43,7 +41,7 @@ export class WebsocketService {
               apikey: environment.API_KEY,
               heartbeat: false,
               subscribe_data_type: ['trade'],
-              subscribe_filter_symbol_id: this.hsMessage,
+              subscribe_filter_symbol_id: 'null',
             });
           },
         },
